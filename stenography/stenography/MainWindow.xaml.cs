@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -47,14 +48,15 @@ namespace stenography
 
             if (dialog.ShowDialog() == true)
             {
-                var encoder = new JpegBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(test));
-                encoder.QualityLevel = 100;
+                //var encoder = new JpegBitmapEncoder();
+                //encoder.Frames.Add(BitmapFrame.Create(test));
+                //encoder.QualityLevel = 100;
 
-                using (var stream = new FileStream(dialog.FileName, FileMode.Create))
-                {
-                    encoder.Save(stream);
-                }
+                //using (var stream = new FileStream(dialog.FileName, FileMode.Create))
+                //{
+                //    encoder.Save(stream);
+                //}
+                work.Save(dialog.FileName);
             }
         }
 
@@ -104,16 +106,70 @@ namespace stenography
             return false;
         }
 
-        private void hideData(object sender, RoutedEventArgs e)
+        private void hide(BitArray message)
         {
-
-            for (int i = 0; i < test.PixelHeight; ++i)
+            int cnt = 0;
+            for (int i = 0; i < work.Height && cnt < message.Length; ++i)
             {
-
-                for (int j = 0; j < test.PixelWidth; ++j)
+                for (int j = 0; j < work.Width && cnt < message.Length; ++j)
                 {
+                    System.Drawing.Color tmp = work.GetPixel(j, i);
+                    int[] val = new int[4];
+                    val[0] = tmp.A - tmp.A % 2 + (message[cnt] ? 1 : 0);
+                    ++cnt;
+                   // System.Diagnostics.Debug.Write(val[0]);
+                    val[1] = tmp.R - tmp.R % 2 + (message[cnt] ? 1 : 0);
+                    ++cnt;
+                   // System.Diagnostics.Debug.Write(val[1]);
+                    val[2] = tmp.G - tmp.G % 2 + (message[cnt] ? 1 : 0);
+                    ++cnt;
+                   // System.Diagnostics.Debug.Write(val[2]);
+                    val[3] = tmp.B - tmp.B % 2 + (message[cnt] ? 1 : 0);
+                    ++cnt;
+                   // System.Diagnostics.Debug.Write(val[3]);
+
+                    work.SetPixel(j, i, System.Drawing.Color.FromArgb(val[0], val[1], val[2], val[3]));
+                    //System.Diagnostics.Debug.Write(work.GetPixel(j, i));
                 }
             }
+        }
+
+        private void get()
+        {
+            long cnt = 0;
+            bool[] arr = new bool[1000];
+            for (int i = 0; i < work.Height && cnt < 10; ++i)
+            {
+                for (int j = 0; j < work.Width && cnt < 10; ++j)
+                {
+                    System.Drawing.Color tmp = work.GetPixel(j, i);
+
+                    arr[cnt+0] = tmp.A % 2 == 1;
+                    System.Diagnostics.Debug.Write(arr[cnt + 0] + " ");
+                    arr[cnt+1] = tmp.R % 2 == 1;
+                    System.Diagnostics.Debug.Write(arr[cnt + 1] + " ");
+                    arr[cnt+2] = tmp.G % 2 == 1;
+                    System.Diagnostics.Debug.Write(arr[cnt + 2] + " ");
+                    arr[cnt+3] = tmp.B % 2 == 1;
+                    System.Diagnostics.Debug.Write(arr[cnt + 3] + " ");
+                    cnt += 4;
+
+                }
+            }
+            //reverse
+            for (int i = 7; i >= 0; i--)
+            {
+                System.Diagnostics.Debug.Write(arr[i] + " ");
+            }
+        }
+
+        private void hideData(object sender, RoutedEventArgs e)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(text.Text);
+            
+            BitArray bit = new BitArray(data);
+            hide(bit);
+            get();
         }
     }
 }
