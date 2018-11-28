@@ -23,6 +23,31 @@ namespace stenography
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+    public static class Extensions
+    {
+        /// <summary>
+        /// Get the array slice between the two indexes.
+        /// ... Inclusive for start index, exclusive for end index.
+        /// </summary>
+        public static T[] Slice<T>(this T[] source, int start, int end)
+        {
+            // Handles negative ends.
+            if (end < 0)
+            {
+                end = source.Length + end;
+            }
+            int len = end - start;
+
+            // Return new array.
+            T[] res = new T[len];
+            for (int i = 0; i < len; i++)
+            {
+                res[i] = source[i + start];
+            }
+            return res;
+        }
+    }
     public partial class MainWindow : Window
     {
         private bool rectangle = false;
@@ -48,14 +73,6 @@ namespace stenography
 
             if (dialog.ShowDialog() == true)
             {
-                //var encoder = new JpegBitmapEncoder();
-                //encoder.Frames.Add(BitmapFrame.Create(test));
-                //encoder.QualityLevel = 100;
-
-                //using (var stream = new FileStream(dialog.FileName, FileMode.Create))
-                //{
-                //    encoder.Save(stream);
-                //}
                 work.Save(dialog.FileName);
             }
         }
@@ -117,59 +134,117 @@ namespace stenography
                     int[] val = new int[4];
                     val[0] = tmp.A - tmp.A % 2 + (message[cnt] ? 1 : 0);
                     ++cnt;
-                   // System.Diagnostics.Debug.Write(val[0]);
                     val[1] = tmp.R - tmp.R % 2 + (message[cnt] ? 1 : 0);
                     ++cnt;
-                   // System.Diagnostics.Debug.Write(val[1]);
                     val[2] = tmp.G - tmp.G % 2 + (message[cnt] ? 1 : 0);
                     ++cnt;
-                   // System.Diagnostics.Debug.Write(val[2]);
                     val[3] = tmp.B - tmp.B % 2 + (message[cnt] ? 1 : 0);
                     ++cnt;
-                   // System.Diagnostics.Debug.Write(val[3]);
 
                     work.SetPixel(j, i, System.Drawing.Color.FromArgb(val[0], val[1], val[2], val[3]));
-                    //System.Diagnostics.Debug.Write(work.GetPixel(j, i));
                 }
             }
         }
-
-        private void get()
+        private byte ConvertBoolArrayToByte(bool[] source)
         {
-            long cnt = 0;
-            bool[] arr = new bool[1000];
-            for (int i = 0; i < work.Height && cnt < 10; ++i)
+            byte result = 0;
+            // This assumes the array never contains more than 8 elements!
+            int index = 8 - source.Length;
+
+            // Loop through the array
+            foreach (bool b in source)
             {
-                for (int j = 0; j < work.Width && cnt < 10; ++j)
+                // if the element is 'true' set the bit at that position
+                if (b)
+                    result |= (byte)(1 << (7 - index));
+
+                index++;
+            }
+
+            return result;
+        }
+
+        private byte[] convertBoolArrToByteArr(bool[] arr)
+        {
+
+            for (int i = 0; i < arr.Length / 2; i++)
+            {
+                bool tmp = arr[i];
+                arr[i] = arr[arr.Length - i - 1];
+                arr[arr.Length - i - 1] = tmp;
+            }
+
+            byte[] toReturn = new byte[arr.Length / 8];
+            int cnt = 0;
+            for(int i = 0; i < arr.Length; i+=8)
+            {
+                toReturn[cnt] = ConvertBoolArrayToByte(arr.Slice(i, i+8));
+            }
+            return toReturn;
+        }
+
+
+        private byte[] get()
+        {
+            bool[] stop = { false, true, true, true, true, false, false, false };
+            int bre = 0;
+            long cnt = 0;
+            List<bool> l = new List<bool>();
+            bool[] arr = new bool[4];
+            for (int i = 0; i < work.Height; ++i)
+            {
+                for (int j = 0; j < work.Width; ++j)
                 {
                     System.Drawing.Color tmp = work.GetPixel(j, i);
-
+                    cnt = 0;
                     arr[cnt+0] = tmp.A % 2 == 1;
-                    System.Diagnostics.Debug.Write(arr[cnt + 0] + " ");
                     arr[cnt+1] = tmp.R % 2 == 1;
-                    System.Diagnostics.Debug.Write(arr[cnt + 1] + " ");
                     arr[cnt+2] = tmp.G % 2 == 1;
-                    System.Diagnostics.Debug.Write(arr[cnt + 2] + " ");
                     arr[cnt+3] = tmp.B % 2 == 1;
-                    System.Diagnostics.Debug.Write(arr[cnt + 3] + " ");
+
+                    if(arr[0] == false &&
+                        arr[1] == false &&
+                        arr[2] == false &&
+                        arr[3] == true)
+                    {
+                        if( i < work.Height)
+                        {
+                            tmp = work.GetPixel(j, i);
+                            cnt = 0;
+                            arr[cnt + 0] = tmp.A % 2 == 1;
+                            arr[cnt + 1] = tmp.R % 2 == 1;
+                            arr[cnt + 2] = tmp.G % 2 == 1;
+                            arr[cnt + 3] = tmp.B % 2 == 1;
+
+                            if(arr[0] == !true &&
+                                arr[1] == !true &&
+                                arr[2] == !true &&
+                                arr[3] == !false)
+                            {
+                                bool[] toReturn = l.ToArray();
+                                return convertBoolArrToByteArr(toReturn);
+                            }
+                        }
+                    }
+                    bre = 0;
+                    l.Add(arr[0]);
+                    l.Add(arr[1]);
+                    l.Add(arr[2]);
+                    l.Add(arr[3]);
                     cnt += 4;
 
                 }
             }
-            //reverse
-            for (int i = 7; i >= 0; i--)
-            {
-                System.Diagnostics.Debug.Write(arr[i] + " ");
-            }
+            return new byte[] { 1 };
         }
 
         private void hideData(object sender, RoutedEventArgs e)
         {
-            byte[] data = Encoding.ASCII.GetBytes(text.Text);
-            
+            byte[] data = Encoding.ASCII.GetBytes(text.Text+"x");
             BitArray bit = new BitArray(data);
             hide(bit);
-            get();
+            var da = get();
+
         }
     }
 }
