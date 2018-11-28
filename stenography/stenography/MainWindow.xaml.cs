@@ -158,11 +158,11 @@ namespace stenography
         private void hide_vertical(BitArray message)
         {
             int cnt = 0;
-            for (int i = 0; i < work.Width && cnt < message.Length; ++i)
+            for (int i = 0; i < work.Width - 1 && cnt < message.Length; ++i)
             {
                 for (int j = 0; j < work.Height && cnt < message.Length; ++j)
                 {
-                    System.Drawing.Color tmp = work.GetPixel(j, i);
+                    System.Drawing.Color tmp = work.GetPixel(i, j);
                     int[] val = new int[4];
                     val[0] = tmp.A - tmp.A % 2 + (message[cnt++] ? 1 : 0);
                     val[1] = tmp.R - tmp.R % 2 + (message[cnt++] ? 1 : 0);
@@ -231,15 +231,15 @@ namespace stenography
                     arr[cnt+3] = tmp.B % 2 == 1;
 
                     if(arr[0] == false &&
-                        arr[1] == false &&
-                        arr[2] == false &&
+                        arr[1] == true &&
+                        arr[2] == true &&
                         arr[3] == true)
                     {
                         l.Add(arr[0]);
                         l.Add(arr[1]);
                         l.Add(arr[2]);
                         l.Add(arr[3]);
-                        if ( i < work.Width - 1)
+                        if ( j < work.Width - 1)
                         {
                             tmp = work.GetPixel(j+1, i);
                             cnt = 0;
@@ -315,10 +315,14 @@ namespace stenography
                     arr[cnt + 3] = tmp.B % 2 == 1;
 
                     if (arr[0] == false &&
-                        arr[1] == false &&
-                        arr[2] == false &&
+                        arr[1] == true &&
+                        arr[2] == true &&
                         arr[3] == true)
                     {
+                        l.Add(arr[0]);
+                        l.Add(arr[1]);
+                        l.Add(arr[2]);
+                        l.Add(arr[3]);
                         if (i < work.Width)
                         {
                             tmp = work.GetPixel(j + 1, i);
@@ -343,7 +347,25 @@ namespace stenography
                         }
                         else
                         {
+                            tmp = work.GetPixel(0, i + 1);
+                            cnt = 0;
+                            arr[cnt + 0] = tmp.A % 2 == 1;
+                            arr[cnt + 1] = tmp.R % 2 == 1;
+                            arr[cnt + 2] = tmp.G % 2 == 1;
+                            arr[cnt + 3] = tmp.B % 2 == 1;
+                            Debug.WriteLine(arr[0]);
+                            Debug.WriteLine(arr[1]);
+                            Debug.WriteLine(arr[2]);
+                            Debug.WriteLine(arr[3]);
 
+                            if (arr[0] == true &&
+                                arr[1] == true &&
+                                arr[2] == true &&
+                                arr[3] == false)
+                            {
+                                bool[] toReturn = l.ToArray();
+                                return convertBoolArrToByteArr(toReturn);
+                            }
                         }
                     }
                     bre = 0;
@@ -360,7 +382,7 @@ namespace stenography
 
         private void hideData(object sender, RoutedEventArgs e)
         {
-            byte[] data = Encoding.ASCII.GetBytes(text.Text+"x");
+            byte[] data = Encoding.ASCII.GetBytes(text.Text+"~");
             BitArray bit = new BitArray(data);
             if (horizontal.IsChecked == true)
                 hide_horizontal(bit);
@@ -378,18 +400,15 @@ namespace stenography
                 da.Reverse();
                 string decoded = Encoding.ASCII.GetString(da);
                 char[] arr = decoded.ToCharArray();
-                //Array.Reverse(array);
+
                 for (int i = 0; i < arr.Length / 2; i++)
                 {
                     char tmp = arr[i];
                     arr[i] = arr[arr.Length - i - 1];
                     arr[arr.Length - i - 1] = tmp;
                 }
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    Debug.Write(arr[i]);
-                }
-                text.Text = arr.ToString();
+
+                text.Text = new string(arr);
             }
             else if(vertical.IsChecked == true)
             {
