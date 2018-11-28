@@ -36,9 +36,12 @@
       </Button>
     </Border>
 
-    <Button Grid.Column="3" Grid.ColumnSpan="2" Grid.Row="1" Content="Ukryj wiadomość" Name="stego" Click="hideData"/>
-    <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="9" Margin="0,0,0,30">
-      <MenuItem Header="Zapisz" Click="save" />
+        <Button Grid.Column="7" Grid.ColumnSpan="2" Grid.Row="1" Content="Ukryj wiadomość" Name="stego" Click="hideData" Margin="0,0,30,0"/>
+        <Button Grid.Column="4" Grid.ColumnSpan="2" Grid.Row="1" Content="Odczytaj wiadomość" Name="s" Click="getData" Margin="30,0,0,0"/>
+        <RadioButton Grid.Column="1" Grid.Row="1" Content="Poziomo" VerticalAlignment="Top" IsChecked="True" Name="horizontal"/>
+        <RadioButton Grid.Column="1" Grid.Row="1" Content="Pionowo" VerticalAlignment="Bottom" Name="vertical"/>
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="9" Height="20" VerticalAlignment="Top">
+            <MenuItem Header="Zapisz" Click="save" />
       <MenuItem Header="Otwórz" Click="read"/>
     </Menu>
   </Grid>
