@@ -58,6 +58,15 @@ namespace stenography
             InitializeComponent();
         }
 
+        private bool check(string text)
+        {
+            if (checkText(text) && (text.Length*8 < (work.Height * work.Width)))
+            {
+                return true;
+            }
+            return false;
+        }
+
         void checkRectangle(object sender, RoutedEventArgs e)
         {
             rectangle = true;
@@ -132,6 +141,10 @@ namespace stenography
                 {
                     System.Drawing.Color tmp = work.GetPixel(j, i);
                     int[] val = new int[4];
+                    val[0] = 0;
+                    val[1] = 0;
+                    val[2] = 0;
+                    val[3] = 0;
                     val[0] = tmp.A - tmp.A % 2 + (message[cnt++] ? 1 : 0);
                     val[1] = tmp.R - tmp.R % 2 + (message[cnt++] ? 1 : 0);
                     val[2] = tmp.G - tmp.G % 2 + (message[cnt++] ? 1 : 0);
@@ -208,6 +221,10 @@ namespace stenography
                 {
                     System.Drawing.Color tmp = work.GetPixel(j, i);
                     cnt = 0;
+                    arr[0] = false;
+                    arr[1] = false;
+                    arr[2] = false;
+                    arr[3] = false;
                     arr[cnt+0] = tmp.A % 2 == 1;
                     arr[cnt+1] = tmp.R % 2 == 1;
                     arr[cnt+2] = tmp.G % 2 == 1;
@@ -218,7 +235,11 @@ namespace stenography
                         arr[2] == false &&
                         arr[3] == true)
                     {
-                        if( i < work.Width)
+                        l.Add(arr[0]);
+                        l.Add(arr[1]);
+                        l.Add(arr[2]);
+                        l.Add(arr[3]);
+                        if ( i < work.Width - 1)
                         {
                             tmp = work.GetPixel(j+1, i);
                             cnt = 0;
@@ -237,12 +258,31 @@ namespace stenography
                                 arr[3] == false)
                             {
                                 bool[] toReturn = l.ToArray();
-                                return convertBoolArrToByteArr(toReturn);
+                                return convertBoolArrToByteArr(toReturn.Slice(0, toReturn.Length-4));
                             }
+                            continue;
                         }
                         else
                         {
+                            tmp = work.GetPixel(0, i+1);
+                            cnt = 0;
+                            arr[cnt + 0] = tmp.A % 2 == 1;
+                            arr[cnt + 1] = tmp.R % 2 == 1;
+                            arr[cnt + 2] = tmp.G % 2 == 1;
+                            arr[cnt + 3] = tmp.B % 2 == 1;
+                            Debug.WriteLine(arr[0]);
+                            Debug.WriteLine(arr[1]);
+                            Debug.WriteLine(arr[2]);
+                            Debug.WriteLine(arr[3]);
 
+                            if (arr[0] == true &&
+                                arr[1] == true &&
+                                arr[2] == true &&
+                                arr[3] == false)
+                            {
+                                bool[] toReturn = l.ToArray();
+                                return convertBoolArrToByteArr(toReturn);
+                            }
                         }
                     }
                     bre = 0;
@@ -320,7 +360,7 @@ namespace stenography
 
         private void hideData(object sender, RoutedEventArgs e)
         {
-            byte[] data = Encoding.ASCII.GetBytes(text.Text + "x");
+            byte[] data = Encoding.ASCII.GetBytes(text.Text+"x");
             BitArray bit = new BitArray(data);
             if (horizontal.IsChecked == true)
                 hide_horizontal(bit);
@@ -331,13 +371,25 @@ namespace stenography
 
         private void getData(object sender, RoutedEventArgs e)
         {
+
             if (horizontal.IsChecked == true)
             {
                 var da = get_horizontal();
+                da.Reverse();
                 string decoded = Encoding.ASCII.GetString(da);
-                char[] array = decoded.ToCharArray();
-                Array.Reverse(array);
-                text.Text = new String(array);
+                char[] arr = decoded.ToCharArray();
+                //Array.Reverse(array);
+                for (int i = 0; i < arr.Length / 2; i++)
+                {
+                    char tmp = arr[i];
+                    arr[i] = arr[arr.Length - i - 1];
+                    arr[arr.Length - i - 1] = tmp;
+                }
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    Debug.Write(arr[i]);
+                }
+                text.Text = arr.ToString();
             }
             else if(vertical.IsChecked == true)
             {
@@ -345,7 +397,7 @@ namespace stenography
                 string decoded = Encoding.ASCII.GetString(da);
                 char[] array = decoded.ToCharArray();
                 Array.Reverse(array);
-                text.Text = new String(array);
+                text.Text = array.ToString();
             }
         }
     }

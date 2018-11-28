@@ -28,7 +28,7 @@
       <ColumnDefinition Width="*"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <TextBox Grid.Column="4" Grid.ColumnSpan="5" Grid.Row="2" Grid.RowSpan="6" Margin="30,30,30,30" Name="text"/>
+    <TextBox Grid.Column="4" Grid.ColumnSpan="5" Grid.Row="2" Grid.RowSpan="6" Margin="30,30,30,30" VerticalScrollBarVisibility="Visible" Name="text"/>
 
     <Border BorderThickness="2" BorderBrush="Black" Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="2" Grid.RowSpan="6" Margin="30,30,30,30" Name="border">
       <Button  Name="picture" Click="checkRectangle">
