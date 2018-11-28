@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -178,7 +179,7 @@ namespace stenography
             int cnt = 0;
             for(int i = 0; i < arr.Length; i+=8)
             {
-                toReturn[cnt] = ConvertBoolArrayToByte(arr.Slice(i, i+8));
+                toReturn[cnt++] = ConvertBoolArrayToByte(arr.Slice(i, i+8));
             }
             return toReturn;
         }
@@ -207,23 +208,31 @@ namespace stenography
                         arr[2] == false &&
                         arr[3] == true)
                     {
-                        if( i < work.Height)
+                        if( i < work.Width)
                         {
-                            tmp = work.GetPixel(j, i);
+                            tmp = work.GetPixel(j+1, i);
                             cnt = 0;
                             arr[cnt + 0] = tmp.A % 2 == 1;
                             arr[cnt + 1] = tmp.R % 2 == 1;
                             arr[cnt + 2] = tmp.G % 2 == 1;
                             arr[cnt + 3] = tmp.B % 2 == 1;
+                            Debug.WriteLine(arr[0]);
+                            Debug.WriteLine(arr[1]);
+                            Debug.WriteLine(arr[2]);
+                            Debug.WriteLine(arr[3]);
 
-                            if(arr[0] == !true &&
-                                arr[1] == !true &&
-                                arr[2] == !true &&
-                                arr[3] == !false)
+                            if (arr[0] == true &&
+                                arr[1] == true &&
+                                arr[2] == true &&
+                                arr[3] == false)
                             {
                                 bool[] toReturn = l.ToArray();
                                 return convertBoolArrToByteArr(toReturn);
                             }
+                        }
+                        else
+                        {
+
                         }
                     }
                     bre = 0;
