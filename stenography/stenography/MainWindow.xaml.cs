@@ -64,7 +64,7 @@ namespace stenography
             {
                 return true;
             }
-            return false;
+            throw new Exception("Za długi tekst.");
         }
 
         void checkRectangle(object sender, RoutedEventArgs e)
@@ -126,10 +126,10 @@ namespace stenography
 
         private bool checkText(string text)
         {
-            string s = Regex.Replace(text, "^[0-9a-zA-Z]", "");
+            string s = Regex.Replace(text, @"[^a-zA-Z\p{P}\d\s]", "");
             if (s == text)
                 return true;
-            return false;
+            throw new Exception("Niedozwolone symbole.");
         }
 
         private void hide_horizontal(BitArray message)
@@ -281,7 +281,7 @@ namespace stenography
                                 arr[3] == false)
                             {
                                 bool[] toReturn = l.ToArray();
-                                return convertBoolArrToByteArr(toReturn);
+                                return convertBoolArrToByteArr(toReturn.Slice(0, toReturn.Length - 4));
                             }
                         }
                     }
@@ -342,8 +342,9 @@ namespace stenography
                                 arr[3] == false)
                             {
                                 bool[] toReturn = l.ToArray();
-                                return convertBoolArrToByteArr(toReturn);
+                                return convertBoolArrToByteArr(toReturn.Slice(0, toReturn.Length - 4));
                             }
+                            continue;
                         }
                         else
                         {
@@ -364,7 +365,7 @@ namespace stenography
                                 arr[3] == false)
                             {
                                 bool[] toReturn = l.ToArray();
-                                return convertBoolArrToByteArr(toReturn);
+                                return convertBoolArrToByteArr(toReturn.Slice(0, toReturn.Length - 4));
                             }
                         }
                     }
@@ -382,13 +383,19 @@ namespace stenography
 
         private void hideData(object sender, RoutedEventArgs e)
         {
-            byte[] data = Encoding.ASCII.GetBytes(text.Text+"~");
-            BitArray bit = new BitArray(data);
-            if (horizontal.IsChecked == true)
-                hide_horizontal(bit);
-            else if (vertical.IsChecked == true)
-                hide_vertical(bit);
-
+            try
+            {
+                check(text.Text);      
+                byte[] data = Encoding.ASCII.GetBytes(text.Text + "~");
+                BitArray bit = new BitArray(data);
+                if (horizontal.IsChecked == true)
+                    hide_horizontal(bit);
+                else if (vertical.IsChecked == true)
+                    hide_vertical(bit);
+            }catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Błąd");
+            }
         }
 
         private void getData(object sender, RoutedEventArgs e)
@@ -414,9 +421,14 @@ namespace stenography
             {
                 var da = get_vertical();
                 string decoded = Encoding.ASCII.GetString(da);
-                char[] array = decoded.ToCharArray();
-                Array.Reverse(array);
-                text.Text = array.ToString();
+                char[] arr = decoded.ToCharArray();
+                for (int i = 0; i < arr.Length / 2; i++)
+                {
+                    char tmp = arr[i];
+                    arr[i] = arr[arr.Length - i - 1];
+                    arr[arr.Length - i - 1] = tmp;
+                }
+                text.Text = new string(arr);
             }
         }
     }
