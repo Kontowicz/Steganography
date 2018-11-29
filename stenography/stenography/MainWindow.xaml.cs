@@ -72,12 +72,18 @@ namespace stenography
 
         private void save(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Title = "Save a picture";
-            dialog.Filter = "Portable Network Graphic (*.png)|*.png|" + "Bmp files (*.bmp)|*.bmp";
+            try
+            {
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.Title = "Save a picture";
+                dialog.Filter = "Portable Network Graphic (*.png)|*.png|" + "Bmp files (*.bmp)|*.bmp";
 
-            if (dialog.ShowDialog() == true)
-                work.Save(dialog.FileName);
+                if (dialog.ShowDialog() == true)
+                    work.Save(dialog.FileName);
+            }catch(Exception ex)
+            {
+                MessageBox.Show("Coś poszło nie tak.\n Orginal message:" + ex.Message, "Błąd");
+            }
         }
 
         private void read(object sender, RoutedEventArgs e)
@@ -129,20 +135,17 @@ namespace stenography
         private void hide_horizontal(BitArray message)
         {
             int cnt = 0;
-            Debug.WriteLine("HIDE");
             for (int i = 0; i < work.Height && cnt < message.Length; ++i)
             {
                 for (int j = 0; j < work.Width && cnt < message.Length; ++j)
                 {
                     System.Drawing.Color tmp = work.GetPixel(j, i);
-                    //Debug.WriteLine("I: {0} J: {1}", i, j);
                     int[] val = new int[] { 0, 0, 0, 0 };
 
                     val[0] = tmp.A - tmp.A % 2 + (message[cnt++] ? 1 : 0);
                     val[1] = tmp.R - tmp.R % 2 + (message[cnt++] ? 1 : 0);
                     val[2] = tmp.G - tmp.G % 2 + (message[cnt++] ? 1 : 0);
                     val[3] = tmp.B - tmp.B % 2 + (message[cnt++] ? 1 : 0);
-                    Debug.WriteLine("val[0]: {0} val[1]: {1} val[2]: {2} val[3]: {3}", val[0], val[1], val[2], val[3]);
                     work.SetPixel(j, i, System.Drawing.Color.FromArgb(val[0], val[1], val[2], val[3]));
                 }
             }
@@ -151,19 +154,16 @@ namespace stenography
         private void hide_vertical(BitArray message)
         {
             int cnt = 0;
-            Debug.WriteLine("HIDE   vertical");
             for (int i = 0; i < work.Width && cnt < message.Length; ++i)
             {
                 for (int j = 0; j < work.Height && cnt < message.Length; ++j)
                 {
-                    Debug.WriteLine("I: {0} J: {1}", i, j);
                     System.Drawing.Color tmp = work.GetPixel(i, j);
                     int[] val = new int[] { 0, 0, 0, 0 };
                     val[0] = tmp.A - tmp.A % 2 + (message[cnt++] ? 1 : 0);
                     val[1] = tmp.R - tmp.R % 2 + (message[cnt++] ? 1 : 0);
                     val[2] = tmp.G - tmp.G % 2 + (message[cnt++] ? 1 : 0);
                     val[3] = tmp.B - tmp.B % 2 + (message[cnt++] ? 1 : 0);
-                    Debug.WriteLine("val[0]: {0} val[1]: {1} val[2]: {2} val[3]: {3}", val[0], val[1], val[2], val[3]);
                     work.SetPixel(i, j, System.Drawing.Color.FromArgb(val[0], val[1], val[2], val[3]));
                 }
             }
@@ -208,22 +208,12 @@ namespace stenography
             return arr;
         }
 
-
         private byte[] convertBoolArrToByteArr(bool[] arr)
         {
-
-            //for (int i = 0; i < arr.Length / 2; i++)
-            //{
-            //    bool tmp = arr[i];
-            //    arr[i] = arr[arr.Length - i - 1];
-            //    arr[arr.Length - i - 1] = tmp;
-            //}
-
             arr = reverse(arr);
-
             byte[] toReturn = new byte[arr.Length / 8];
             int cnt = 0;
-            for(int i = 0; i < arr.Length; i+=8)//bug
+            for(int i = 0; i < arr.Length; i+=8)
             {
                 toReturn[cnt++] = ConvertBoolArrayToByte(arr.Slice(i, i+8));
             }
@@ -234,13 +224,11 @@ namespace stenography
         {
             List<bool> l = new List<bool>();
             bool[] arr = new bool[4];
-            Debug.WriteLine("GET");
             for (int i = 0; i < work.Height; ++i)
             {
                 for (int j = 0; j < work.Width; ++j)
                 {
                     System.Drawing.Color tmp = work.GetPixel(j, i);
-                    Debug.WriteLine("I: {0} J: {1}", i, j);
                     arr[0] = tmp.A % 2 == 1;
                     arr[1] = tmp.R % 2 == 1;
                     arr[2] = tmp.G % 2 == 1;
@@ -250,7 +238,6 @@ namespace stenography
                     l.Add(arr[1]);
                     l.Add(arr[2]);
                     l.Add(arr[3]);
-                    Debug.WriteLine("l[0]: {0} l[1]: {1} l[2]: {2} l[3]: {3}", l[l.Count - 1], l[l.Count - 2], l[l.Count - 3], l[l.Count - 4]);
                     if(l.Count > 8)
                     {
                         if (
@@ -275,76 +262,6 @@ namespace stenography
 
         private byte[] get_vertical()
         {
-            Debug.WriteLine("GET vertical");
-            //long cnt = 0;
-            //List<bool> l = new List<bool>();
-            //bool[] arr = new bool[4];
-            //for (int i = 0; i < work.Width; ++i)
-            //{
-            //    for (int j = 0; j < work.Height; ++j)
-            //    {
-            //        System.Drawing.Color tmp = work.GetPixel(j, i);
-            //        cnt = 0;
-            //        arr[cnt + 0] = tmp.A % 2 == 1;
-            //        arr[cnt + 1] = tmp.R % 2 == 1;
-            //        arr[cnt + 2] = tmp.G % 2 == 1;
-            //        arr[cnt + 3] = tmp.B % 2 == 1;
-
-            //        if (arr[0] == false &&
-            //            arr[1] == true &&
-            //            arr[2] == true &&
-            //            arr[3] == true)
-            //        {
-            //            l.Add(arr[0]);
-            //            l.Add(arr[1]);
-            //            l.Add(arr[2]);
-            //            l.Add(arr[3]);
-            //            if (i < work.Width)
-            //            {
-            //                tmp = work.GetPixel(j, i);
-            //                cnt = 0;
-            //                arr[cnt + 0] = tmp.A % 2 == 1;
-            //                arr[cnt + 1] = tmp.R % 2 == 1;
-            //                arr[cnt + 2] = tmp.G % 2 == 1;
-            //                arr[cnt + 3] = tmp.B % 2 == 1;
-
-            //                if (arr[0] == true &&
-            //                    arr[1] == true &&
-            //                    arr[2] == true &&
-            //                    arr[3] == false)
-            //                {
-            //                    bool[] toReturn = l.ToArray();
-            //                    return convertBoolArrToByteArr(toReturn.Slice(0, toReturn.Length - 4));
-            //                }
-            //              //  continue;
-            //            }
-            //            else
-            //            {
-            //                tmp = work.GetPixel(0, i + 1);
-            //                cnt = 0;
-            //                arr[cnt + 0] = tmp.A % 2 == 1;
-            //                arr[cnt + 1] = tmp.R % 2 == 1;
-            //                arr[cnt + 2] = tmp.G % 2 == 1;
-            //                arr[cnt + 3] = tmp.B % 2 == 1;
-
-            //                if (arr[0] == true &&
-            //                    arr[1] == true &&
-            //                    arr[2] == true &&
-            //                    arr[3] == false)
-            //                {
-            //                    bool[] toReturn = l.ToArray();
-            //                    return convertBoolArrToByteArr(toReturn.Slice(0, toReturn.Length - 4));
-            //                }
-            //            }
-            //        }
-            //        l.Add(arr[0]);
-            //        l.Add(arr[1]);
-            //        l.Add(arr[2]);
-            //        l.Add(arr[3]);
-            //        cnt += 4;
-            //    }
-            //}
-
             List<bool> l = new List<bool>();
             bool[] arr = new bool[4];
             for (int i = 0; i < work.Width; ++i)
@@ -352,7 +269,6 @@ namespace stenography
                 for (int j = 0; j < work.Height; ++j)
                 {
                     System.Drawing.Color tmp = work.GetPixel(i, j);
-                    Debug.WriteLine("I: {0} J: {1}", i, j);
                     arr[0] = tmp.A % 2 == 1;
                     arr[1] = tmp.R % 2 == 1;
                     arr[2] = tmp.G % 2 == 1;
@@ -362,8 +278,7 @@ namespace stenography
                     l.Add(arr[1]);
                     l.Add(arr[2]);
                     l.Add(arr[3]);
-                    Debug.WriteLine("l[0]: {0} l[1]: {1} l[2]: {2} l[3]: {3}", l[l.Count - 1], l[l.Count - 2], l[l.Count - 3], l[l.Count - 4]);
-                    if (l.Count > 8)
+                   if (l.Count > 8)
                     {
                         if (
                         l[l.Count - 1] == false &&
@@ -392,6 +307,7 @@ namespace stenography
                 check(text.Text);      
                 byte[] data = Encoding.ASCII.GetBytes(text.Text + "~");
                 BitArray bit = new BitArray(data);
+
                 if (horizontal.IsChecked == true)
                     hide_horizontal(bit);
                 else if (vertical.IsChecked == true)
@@ -404,39 +320,21 @@ namespace stenography
 
         private void getData(object sender, RoutedEventArgs e)
         {
-
             if (horizontal.IsChecked == true)
             {
                 var da = get_horizontal();
                 da.Reverse();
                 string decoded = Encoding.ASCII.GetString(da);
                 char[] arr = decoded.ToCharArray();
-
-                //for (int i = 0; i < arr.Length / 2; i++)
-                //{
-                //    char tmp = arr[i];
-                //    arr[i] = arr[arr.Length - i - 1];
-                //    arr[arr.Length - i - 1] = tmp;
-                //}
-
                 arr = reverse(arr);
-
                 text.Text = new string(arr);
             }
-            else if(vertical.IsChecked == true)
+            else if (vertical.IsChecked == true)
             {
                 var da = get_vertical();
                 string decoded = Encoding.ASCII.GetString(da);
                 char[] arr = decoded.ToCharArray();
-                //for (int i = 0; i < arr.Length / 2; i++)
-                //{
-                //    char tmp = arr[i];
-                //    arr[i] = arr[arr.Length - i - 1];
-                //    arr[arr.Length - i - 1] = tmp;
-                //}
-
                 arr = reverse(arr);
-
                 text.Text = new string(arr);
             }
         }
