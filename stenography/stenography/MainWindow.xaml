@@ -42,7 +42,8 @@
         <RadioButton Grid.Column="1" Grid.Row="1" Content="Pionowo" VerticalAlignment="Bottom" Name="vertical"/>
         <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="9" Height="20" VerticalAlignment="Top">
             <MenuItem Header="Zapisz" Click="save" />
-      <MenuItem Header="Otwórz" Click="read"/>
+            <MenuItem Header="Otwórz" Click="read"/>
+            <MenuItem Header="O prograrmie" Click="about"/>
     </Menu>
   </Grid>
 </Window>

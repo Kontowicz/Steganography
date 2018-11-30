@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>O programie.</title>
+	</head>
+
+	<body>
+		<h1>Autor programu: Piotr Kontowicz, student 3 roku inrmatyki na wydziale elektrycznym.</h1>
+		
+		<h2>Opis programu:</h2>
+		Program umożliwia ukrycia wiadomości tekstowej w obrazie o rozszerzeniu png lub bmp. Wiadomość może zostać ukryta w obrazie poziomo lub pionowo
+		, wybór podejmuje użytkownik - domyślnym ustawieniem jest ukrywanie poziomo.
+		
+		<h2>Ograniczenia:</h2>
+			<ul>
+				<li> Dozwolone formaty zdjeć to: bmp i png.
+				<li> Długość wiadomosci którą można umieścić w obrazie określona jest jako: &ltLiczba znaków w tekście&gt * 8 &lt= &ltwysokość obrazu w pikselach&gt * &ltszerokość obrazu w pikselach&gt
+				<li> Zbiór dozowolonych znaków w tekście jest określony wyrażniem regularnym: [^a-zA-Z\p{P}\d\s]
+			</ul>			
+		
+		<h2>Używanie programu:</h2>
+		
+		<h3>Wczytanie tekstu:</h3>
+			<ul>
+				<li> Z menu wybrać opcję "otwórz".
+				<li> Następnie wybrać porzadany plik txt.
+				<li> Zakończyć operację przyciskiem "Otwórz".
+			</ul>
+		
+		Plik zostanie wczytawny w pole tekstowe.
+		
+		<h3>Wczytanie obrazu:</h3>
+			<ul>
+				<li> Kliknąć na szary prostokąt, jego obramowane zmieni kolor na niebieski co oznacza że po wybraniu z menu opcji "otwórz" będziemy 
+				mogli wczytać w to pole obraz o rozszerzeniu bmp lub png.
+				<li> Z menu wybrać opcję "otwórz".
+				<li> Następnie wybrać potrzbny plik.
+				<li> Zakończyć operację przyciskiem "Otwórz".
+			</ul>
+		Obraz zostanie wczytany w odpowienie pole.
+		
+		<h3>Ukrywanie wiadomości:</h3>
+			<ul>
+				<li> Wczytaj obraz i teskt w dowolnej kolejności.
+				<li> Wybierz w jaki sposób wiadomość ma zostać ukryta.
+				<li> Kliknij przycisk "Ukryj wiadomość".
+			</ul>
+		Do ukrycia wiadomości wymagane jest wczytanie obrazu oraz tesktu. Test do ukrycia można wprowadzić z pliku lub z klawiatury.
+
+		<h3>Odczytywanie wiadomości:</h3>
+			<ul>
+				<li> Wczytaj obraz.
+				<li> Wybierz w jaki sposób wiadomość ma zostać odczytana.
+				<li> Kliknij przycisk "Odczytaj wiadomość".
+				<li> Widomośc pojawi się w polu tekstowym.
+			</ul>		
+		
+		<h3>Zapis zdjęcia:</h3>
+		Po wykoaniu opracji na pliku, aby zapisać obraz wybierz z menu "Zapisz", następnie podaj nazwę pliku i wybierz jego lokalizację w systemie
+		plików i kliknij "Zapis".
+	</body>
+</html>

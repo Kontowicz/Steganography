@@ -82,7 +82,7 @@ namespace stenography
                     work.Save(dialog.FileName);
             }catch(Exception ex)
             {
-                MessageBox.Show("Coś poszło nie tak.\n Orginal message:" + ex.Message, "Błąd");
+                MessageBox.Show("Orginal message:" + ex.Message, "Błąd");
             }
         }
 
@@ -103,7 +103,7 @@ namespace stenography
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Coś poszło nie tak.\n Orginal message:" + ex.Message, "Błąd");
+                    MessageBox.Show("Orginal message:" + ex.Message, "Błąd");
                 }
                 border.BorderBrush = new SolidColorBrush(Colors.Black);
                 rectangle = false;
@@ -119,7 +119,7 @@ namespace stenography
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Coś poszło nie tak.\n Orginal message:" + ex.Message, "Błąd");
+                    MessageBox.Show("Orginal message:" + ex.Message, "Błąd");
                 }
             }
         }
@@ -337,6 +337,18 @@ namespace stenography
                 arr = reverse(arr);
                 text.Text = new string(arr);
             }
+        }
+
+        private void about(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(@"..\..\about.html");
+            }catch(Exception ex)
+            {
+                MessageBox.Show("Orginal message:" + ex.Message, "Błąd");
+            }
+            
         }
     }
 }
