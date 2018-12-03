@@ -8,9 +8,17 @@
 		<h1>Autor programu: Piotr Kontowicz, student 3 roku inrmatyki na wydziale elektrycznym.</h1>
 		
 		<h2>Opis programu:</h2>
-		Program umożliwia ukrycia wiadomości tekstowej w obrazie o rozszerzeniu png lub bmp. Wiadomość może zostać ukryta w obrazie poziomo lub pionowo
+		Program umożliwia ukrycia wiadomości tekstowej w obrazie (na najmniej znaczących bitach) o rozszerzeniu png lub bmp. Wiadomość może zostać ukryta w obrazie poziomo lub pionowo
 		, wybór podejmuje użytkownik - domyślnym ustawieniem jest ukrywanie poziomo.
 		
+		<h2>Algorytm:</h2>
+		
+			<ul>
+				<li> Zamień podany test na postać biarną.
+				<li> Iterowanie po n piwerszych pikselach zdjęcia gdzie n jest długoscią wiadomości w bitach.
+				<li> Ustawienie LSB piksela w obrazie tak aby zapisać w nim odpowiedni bit obrazu.
+			</ul>					
+
 		<h2>Ograniczenia:</h2>
 			<ul>
 				<li> Dozwolone formaty zdjeć to: bmp i png.
